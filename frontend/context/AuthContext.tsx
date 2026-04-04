@@ -14,8 +14,10 @@ interface AuthContextType {
   user: Usuario | null;
   token: string | null;
   isLoading: boolean;
-  login: (nombre: string, contrasena: string) => Promise<void>;
+  login: (username: string, contrasena: string) => Promise<void>;
+  loginWithToken: (token: string, user: Usuario) => Promise<void>;
   register: (
+    username: string,
     nombre: string,
     correo: string,
     contrasena: string,
@@ -52,9 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const login = useCallback(async (nombre: string, contrasena: string) => {
-    const response = await api.login(nombre, contrasena);
+  const login = useCallback(async (username: string, contrasena: string) => {
+    const response = await api.login(username, contrasena);
     const { token: newToken, user: newUser } = response.data;
+    await AsyncStorage.setItem('token', newToken);
+    await AsyncStorage.setItem('user', JSON.stringify(newUser));
+    setToken(newToken);
+    setUser(newUser);
+  }, []);
+
+  const loginWithToken = useCallback(async (newToken: string, newUser: Usuario) => {
     await AsyncStorage.setItem('token', newToken);
     await AsyncStorage.setItem('user', JSON.stringify(newUser));
     setToken(newToken);
@@ -63,13 +72,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async (
+      username: string,
       nombre: string,
       correo: string,
       contrasena: string,
       edad?: number,
       telefono?: number
     ) => {
-      const response = await api.register(nombre, correo, contrasena, edad, telefono);
+      const response = await api.register(username, nombre, correo, contrasena, edad, telefono);
       const { token: newToken, user: newUser } = response.data;
       await AsyncStorage.setItem('token', newToken);
       await AsyncStorage.setItem('user', JSON.stringify(newUser));
@@ -93,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, register, logout, updateUser }}
+      value={{ user, token, isLoading, login, loginWithToken, register, logout, updateUser }}
     >
       {children}
     </AuthContext.Provider>

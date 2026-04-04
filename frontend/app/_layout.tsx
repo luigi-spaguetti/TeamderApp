@@ -1,9 +1,15 @@
 import React from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Platform } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Colors from '../constants/Colors';
+
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = 'input, textarea { outline: none !important; }';
+  document.head.appendChild(style);
+}
 
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();

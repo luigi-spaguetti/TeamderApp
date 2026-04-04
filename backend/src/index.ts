@@ -10,6 +10,7 @@ import partidosRoutes from './routes/partidos';
 import gruposRoutes from './routes/grupos';
 import solicitudesRoutes from './routes/solicitudes';
 import historialRoutes from './routes/historial';
+import amigosRoutes from './routes/amigos';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.use('/api/partidos', partidosRoutes);
 app.use('/api/grupos', gruposRoutes);
 app.use('/api/solicitudes', solicitudesRoutes);
 app.use('/api/historial', historialRoutes);
+app.use('/api/amigos', amigosRoutes);
 
 app.get('/', (_req, res) => {
   res.json({ message: 'API de Teamder funcionando correctamente.' });

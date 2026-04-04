@@ -9,9 +9,10 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import DetailMap from '../../components/DetailMap';
 import { PartidoDetalle } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
@@ -49,6 +50,7 @@ export default function PartidoDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [partido, setPartido] = useState<PartidoDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -176,6 +178,15 @@ export default function PartidoDetailScreen() {
             </View>
           </View>
 
+          {/* Map */}
+          {partido.latitud != null && partido.longitud != null && (
+            <DetailMap
+              latitud={partido.latitud}
+              longitud={partido.longitud}
+              pista={partido.pista}
+            />
+          )}
+
           {/* Capacity */}
           <View style={styles.capacitySection}>
             <View style={styles.capacityHeader}>
@@ -226,7 +237,7 @@ export default function PartidoDetailScreen() {
         </ScrollView>
 
         {/* Action Button */}
-        <View style={styles.actionContainer}>
+        <View style={[styles.actionContainer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
           {isInscrito ? (
             <TouchableOpacity
               style={[styles.actionButton, styles.actionButtonDanger, actionLoading && styles.buttonDisabled]}
@@ -297,7 +308,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 20,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -310,7 +321,7 @@ const styles = StyleSheet.create({
   grupoBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -442,7 +453,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   youBadge: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,

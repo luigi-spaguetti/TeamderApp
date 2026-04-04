@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     marginLeft: 3,
   },
   youBadge: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,

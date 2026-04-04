@@ -9,12 +9,16 @@ import {
   GrupoDetalle,
   Solicitud,
   HistorialItem,
+  Amigo,
+  SolicitudAmistad,
 } from '../types';
 
+const LOCAL_IP = '192.168.1.19';
+
 const BASE_URL =
-  Platform.OS === 'android'
-    ? 'http://10.0.2.2:3000/api'
-    : 'http://localhost:3000/api';
+  Platform.OS === 'web'
+    ? 'http://localhost:3000/api'
+    : `http://${LOCAL_IP}:3000/api`;
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const token = await AsyncStorage.getItem('token');
@@ -52,16 +56,17 @@ async function request<T>(
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 export async function login(
-  nombre: string,
+  username: string,
   contrasena: string
 ): Promise<ApiResponse<{ token: string; user: Usuario }>> {
   return request('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ nombre, contrasena }),
+    body: JSON.stringify({ username, contrasena }),
   });
 }
 
 export async function register(
+  username: string,
   nombre: string,
   correo: string,
   contrasena: string,
@@ -70,7 +75,28 @@ export async function register(
 ): Promise<ApiResponse<{ token: string; user: Usuario }>> {
   return request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ nombre, correo, contrasena, edad, telefono }),
+    body: JSON.stringify({ username, nombre, correo, contrasena, edad, telefono }),
+  });
+}
+
+export async function googleAuth(
+  idToken: string
+): Promise<any> {
+  return request('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ idToken }),
+  });
+}
+
+export async function googleComplete(data: {
+  googleId: string;
+  email: string;
+  nombre: string;
+  username: string;
+}): Promise<ApiResponse<{ token: string; user: Usuario }>> {
+  return request('/auth/google/complete', {
+    method: 'POST',
+    body: JSON.stringify(data),
   });
 }
 
@@ -93,11 +119,13 @@ export async function updateUsuario(
 // ─── Partidos ────────────────────────────────────────────────────────────────
 
 export async function getPartidos(filters?: {
+  provincia?: string;
   municipio?: string;
   modalidad?: string;
   fecha?: string;
 }): Promise<ApiResponse<Partido[]>> {
   const params = new URLSearchParams();
+  if (filters?.provincia) params.append('provincia', filters.provincia);
   if (filters?.municipio) params.append('municipio', filters.municipio);
   if (filters?.modalidad) params.append('modalidad', filters.modalidad);
   if (filters?.fecha) params.append('fecha', filters.fecha);
@@ -112,12 +140,15 @@ export async function getPartido(
 }
 
 export async function createPartido(data: {
+  provincia: string;
   municipio: string;
   pista: string;
   modalidad: string;
   fecha: string;
   hora: string;
   huecos: number;
+  latitud?: number;
+  longitud?: number;
   id_grupo?: number;
 }): Promise<ApiResponse<Partido>> {
   return request('/partidos', {
@@ -188,6 +219,43 @@ export async function responderSolicitud(
   return request(`/solicitudes/${id}`, {
     method: 'PUT',
     body: JSON.stringify({ estado }),
+  });
+}
+
+// ─── Amigos ─────────────────────────────────────────────────────────────────
+
+export async function getAmigos(): Promise<ApiResponse<Amigo[]>> {
+  return request('/amigos');
+}
+
+export async function getSolicitudesAmistad(): Promise<ApiResponse<SolicitudAmistad[]>> {
+  return request('/amigos/solicitudes');
+}
+
+export async function enviarSolicitudAmistad(
+  username: string
+): Promise<{ message: string }> {
+  return request('/amigos/solicitud', {
+    method: 'POST',
+    body: JSON.stringify({ username }),
+  });
+}
+
+export async function responderSolicitudAmistad(
+  id: number,
+  estado: 'aceptada' | 'rechazada'
+): Promise<{ message: string }> {
+  return request(`/amigos/solicitud/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ estado }),
+  });
+}
+
+export async function eliminarAmigo(
+  id: number
+): Promise<{ message: string }> {
+  return request(`/amigos/${id}`, {
+    method: 'DELETE',
   });
 }
 

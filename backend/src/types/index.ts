@@ -2,9 +2,11 @@ import { Request } from 'express';
 
 export interface Usuario {
   id: number;
+  username: string;
   nombre: string;
   correo: string;
   contrasena: string;
+  google_id: string | null;
   edad: number | null;
   telefono: number | null;
   descripcion: string | null;

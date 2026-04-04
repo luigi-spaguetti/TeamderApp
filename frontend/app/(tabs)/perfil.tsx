@@ -68,14 +68,20 @@ export default function PerfilScreen() {
   }
 
   function handleLogout() {
-    Alert.alert(
-      'Cerrar sesión',
-      '¿Estás seguro de que quieres cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Cerrar sesión', style: 'destructive', onPress: logout },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        logout();
+      }
+    } else {
+      Alert.alert(
+        'Cerrar sesión',
+        '¿Estás seguro de que quieres cerrar sesión?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Cerrar sesión', style: 'destructive', onPress: logout },
+        ]
+      );
+    }
   }
 
   if (!user) {
@@ -99,6 +105,7 @@ export default function PerfilScreen() {
               <Ionicons name="person" size={40} color={Colors.white} />
             </View>
             <Text style={styles.userName}>{user.nombre}</Text>
+            <Text style={styles.userUsername}>@{user.username}</Text>
             {!editing && (
               <TouchableOpacity
                 style={styles.editButton}
@@ -295,6 +302,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: Colors.text,
   },
+  userUsername: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+    marginTop: 2,
+  },
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -302,7 +315,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
   },
   editButtonText: {
     fontSize: 14,
@@ -331,7 +344,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,

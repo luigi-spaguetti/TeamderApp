@@ -9,7 +9,7 @@
     "newArchEnabled": true,
     "scheme": "teamder",
     "splash": {
-      "backgroundColor": "#4CAF50"
+      "backgroundColor": "#1565C0"
     },
     "ios": {
       "supportsTablet": true,
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#4CAF50"
+        "backgroundColor": "#1565C0"
       },
       "package": "com.teamder.app"
     },

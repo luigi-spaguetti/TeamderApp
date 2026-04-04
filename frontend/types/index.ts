@@ -1,5 +1,6 @@
 export interface Usuario {
   id: number;
+  username: string;
   nombre: string;
   correo: string;
   edad: number | null;
@@ -16,6 +17,7 @@ export interface Grupo {
 
 export interface Partido {
   id: number;
+  provincia: string;
   municipio: string;
   pista: string;
   modalidad: string;
@@ -23,6 +25,8 @@ export interface Partido {
   hora: string;
   huecos: number;
   huecos_inscritos: number;
+  latitud: number | null;
+  longitud: number | null;
   id_grupo: number | null;
 }
 
@@ -70,6 +74,7 @@ export interface HistorialItem {
   id: number;
   id_usuario: number;
   id_partido: number;
+  provincia: string;
   municipio: string;
   pista: string;
   modalidad: string;
@@ -78,6 +83,27 @@ export interface HistorialItem {
   huecos: number;
   huecos_inscritos: number;
   id_grupo: number | null;
+}
+
+export interface Amigo {
+  id: number;
+  username: string;
+  nombre: string;
+  correo: string;
+  edad: number | null;
+  telefono: number | null;
+  descripcion: string | null;
+}
+
+export interface SolicitudAmistad {
+  id: number;
+  id_usuario: number;
+  username: string;
+  nombre: string;
+  correo: string;
+  edad: number | null;
+  telefono: number | null;
+  descripcion: string | null;
 }
 
 export interface ApiResponse<T> {

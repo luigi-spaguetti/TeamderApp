@@ -10,28 +10,38 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
 
 export default function LoginScreen() {
-  const [nombre, setNombre] = useState('');
+  const [username, setUsername] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
+  // Google Sign-In placeholder - requires Google Cloud configuration
+  function handleGoogleSignIn() {
+    Alert.alert(
+      'Google Sign-In',
+      'Para activar el inicio de sesión con Google, configura tu Google Client ID en la consola de Google Cloud.'
+    );
+  }
+
   async function handleLogin() {
-    if (!nombre.trim() || !contrasena.trim()) {
+    if (!username.trim() || !contrasena.trim()) {
       Alert.alert('Error', 'Por favor, completa todos los campos.');
       return;
     }
 
     setLoading(true);
     try {
-      await login(nombre.trim(), contrasena);
+      await login(username.trim(), contrasena);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo iniciar sesión.');
     } finally {
@@ -49,9 +59,11 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerContainer}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="football" size={48} color={Colors.white} />
-          </View>
+          <Image
+            source={require('../../assets/logosm.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Teamder</Text>
           <Text style={styles.tagline}>Encuentra tu partido</Text>
         </View>
@@ -61,7 +73,7 @@ export default function LoginScreen() {
 
           <View style={styles.inputContainer}>
             <Ionicons
-              name="person-outline"
+              name="at-outline"
               size={20}
               color={Colors.textSecondary}
               style={styles.inputIcon}
@@ -70,8 +82,8 @@ export default function LoginScreen() {
               style={styles.input}
               placeholder="Nombre de usuario"
               placeholderTextColor={Colors.textSecondary}
-              value={nombre}
-              onChangeText={setNombre}
+              value={username}
+              onChangeText={setUsername}
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -107,6 +119,21 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>o</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogleSignIn}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="logo-google" size={20} color="#DB4437" />
+            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.linkContainer}
             onPress={() => router.push('/(auth)/register')}
@@ -118,6 +145,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
     </KeyboardAvoidingView>
   );
 }
@@ -137,19 +165,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+  logo: {
+    width: 120,
+    height: 120,
     marginBottom: 16,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   title: {
     fontSize: 36,
@@ -217,6 +236,42 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 18,
     fontWeight: '700',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: Colors.textSecondary,
+    fontSize: 14,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    gap: 10,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+  },
+  googleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
   },
   linkContainer: {
     marginTop: 20,

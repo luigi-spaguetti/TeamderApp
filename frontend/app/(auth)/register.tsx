@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import Colors from '../../constants/Colors';
 
 export default function RegisterScreen() {
+  const [username, setUsername] = useState('');
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -27,14 +28,15 @@ export default function RegisterScreen() {
   const router = useRouter();
 
   async function handleRegister() {
-    if (!nombre.trim() || !correo.trim() || !contrasena.trim()) {
-      Alert.alert('Error', 'Nombre, correo y contraseña son obligatorios.');
+    if (!username.trim() || !nombre.trim() || !correo.trim() || !contrasena.trim()) {
+      Alert.alert('Error', 'Usuario, nombre, correo y contraseña son obligatorios.');
       return;
     }
 
     setLoading(true);
     try {
       await register(
+        username.trim(),
         nombre.trim(),
         correo.trim(),
         contrasena,
@@ -70,7 +72,7 @@ export default function RegisterScreen() {
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
             <Ionicons
-              name="person-outline"
+              name="at-outline"
               size={20}
               color={Colors.textSecondary}
               style={styles.inputIcon}
@@ -79,10 +81,26 @@ export default function RegisterScreen() {
               style={styles.input}
               placeholder="Nombre de usuario *"
               placeholderTextColor={Colors.textSecondary}
-              value={nombre}
-              onChangeText={setNombre}
+              value={username}
+              onChangeText={setUsername}
               autoCapitalize="none"
               autoCorrect={false}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="person-outline"
+              size={20}
+              color={Colors.textSecondary}
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre *"
+              placeholderTextColor={Colors.textSecondary}
+              value={nombre}
+              onChangeText={setNombre}
             />
           </View>
 

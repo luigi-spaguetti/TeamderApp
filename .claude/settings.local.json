@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(where.exe node:*)",
+      "Bash(winget.exe install:*)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
+      "Bash(npm --version)",
+      "Bash(npm run:*)",
+      "Bash(npx expo:*)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d '{\"nombre\":\"Luis\",\"contrasena\":\"1234\"}')",
+      "Bash(node -e \"const bcrypt = require\\('bcryptjs'\\); bcrypt.hash\\('1234', 10\\).then\\(h => console.log\\(h\\)\\);\")",
+      "Bash(node -e ':*)",
+      "Bash(grep -E \"\\\\.\\(png|jpg|jpeg|gif|svg\\)$\")",
+      "Bash(npx kill-port:*)",
+      "Bash(taskkill //F //FI \"WINDOWTITLE eq *backend*\")",
+      "Bash(powershell -Command \"Get-Process -Id \\(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue\\).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(mysql -u root -proot teamder)",
+      "Bash(mysql -u root -proot -e \"source C:/Users/luiss/Documents/TeamderApp/teamder.sql\")",
+      "Bash(mysql -u root -proot --default-character-set=utf8mb4)",
+      "Bash(mysql -u root -proot --default-character-set=utf8mb4 -e \"SELECT municipio FROM teamder.partidos LIMIT 1;\")",
+      "Bash(cat /proc/*/fd/1)",
+      "Bash(jobs -l)",
+      "Bash(mysql -u root -p1234 teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")",
+      "Bash(mysql -u root teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")",
+      "Bash(mysql -u root -proot teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")"
+    ]
+  }
+}

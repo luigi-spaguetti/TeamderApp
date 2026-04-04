@@ -5,10 +5,15 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export const getPartidos = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { municipio, modalidad, fecha } = req.query;
+    const { provincia, municipio, modalidad, fecha } = req.query;
 
     let query = 'SELECT * FROM partidos WHERE (fecha > CURDATE() OR (fecha = CURDATE() AND hora >= CURTIME()))';
     const params: any[] = [];
+
+    if (provincia) {
+      query += ' AND provincia = ?';
+      params.push(provincia);
+    }
 
     if (municipio) {
       query += ' AND municipio = ?';
@@ -76,10 +81,10 @@ export const getPartidoById = async (req: AuthRequest, res: Response): Promise<v
 
 export const createPartido = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { municipio, pista, modalidad, fecha, hora, huecos, id_grupo } = req.body;
+    const { provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud, longitud, id_grupo } = req.body;
 
-    if (!municipio || !pista || !modalidad || !fecha || !hora || !huecos) {
-      res.status(400).json({ error: 'Los campos municipio, pista, modalidad, fecha, hora y huecos son obligatorios.' });
+    if (!provincia || !municipio || !pista || !modalidad || !fecha || !hora || !huecos) {
+      res.status(400).json({ error: 'Los campos provincia, municipio, pista, modalidad, fecha, hora y huecos son obligatorios.' });
       return;
     }
 
@@ -96,14 +101,15 @@ export const createPartido = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO partidos (municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos, id_grupo) VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
-      [municipio, pista, modalidad, fecha, hora, huecos, id_grupo || null]
+      'INSERT INTO partidos (provincia, municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos, latitud, longitud, id_grupo) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)',
+      [provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud || null, longitud || null, id_grupo || null]
     );
 
     res.status(201).json({
       message: 'Partido creado correctamente.',
       data: {
         id: result.insertId,
+        provincia,
         municipio,
         pista,
         modalidad,
@@ -111,6 +117,8 @@ export const createPartido = async (req: AuthRequest, res: Response): Promise<vo
         hora,
         huecos,
         huecos_inscritos: 0,
+        latitud: latitud || null,
+        longitud: longitud || null,
         id_grupo: id_grupo || null
       }
     });

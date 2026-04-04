@@ -63,7 +63,7 @@ export default function PartidoCard({ partido }: PartidoCardProps) {
           <View style={styles.locationRow}>
             <Ionicons name="location-outline" size={14} color={Colors.textSecondary} />
             <Text style={styles.locationText}>
-              {partido.pista} - {partido.municipio}
+              {partido.pista} - {partido.municipio} ({partido.provincia})
             </Text>
           </View>
         </View>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: Colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
