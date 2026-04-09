@@ -3,6 +3,7 @@ const Colors = {
   primaryDark: '#0D47A1',
   primaryLight: '#E3F2FD',
   secondary: '#FF9800',
+  secondaryLight: '#FFF3E0',
   background: '#F5F5F5',
   card: '#FFFFFF',
   text: '#212121',

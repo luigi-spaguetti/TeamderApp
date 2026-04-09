@@ -19,6 +19,7 @@ import { Grupo, Amigo, SolicitudAmistad } from '../../types';
 import * as api from '../../services/api';
 import GrupoCard from '../../components/GrupoCard';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 type SubTab = 'amigos' | 'grupos';
 
@@ -48,7 +49,7 @@ export default function SocialScreen() {
       const response = await api.getGrupos();
       setGrupos(response.data);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudieron cargar los grupos.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('social.loadGroupsError'));
     }
   }, []);
 
@@ -61,7 +62,7 @@ export default function SocialScreen() {
       setAmigos(amigosRes.data);
       setSolicitudes(solicitudesRes.data);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudieron cargar los amigos.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('social.loadFriendsError'));
     }
   }, []);
 
@@ -83,18 +84,18 @@ export default function SocialScreen() {
 
   async function handleCreateGrupo() {
     if (!newNombreGrupo.trim()) {
-      Alert.alert('Error', 'El nombre del grupo es obligatorio.');
+      Alert.alert(i18n.t('common.error'), i18n.t('social.groupNameRequired'));
       return;
     }
     setCreatingGrupo(true);
     try {
       await api.createGrupo(newNombreGrupo.trim());
-      Alert.alert('Grupo creado', 'El grupo se ha creado correctamente.');
+      Alert.alert(i18n.t('social.groupCreated'), i18n.t('social.groupCreatedMsg'));
       setShowCreateGrupo(false);
       setNewNombreGrupo('');
       await loadGrupos();
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo crear el grupo.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('social.createGroupError'));
     } finally {
       setCreatingGrupo(false);
     }
@@ -109,17 +110,17 @@ export default function SocialScreen() {
 
   async function handleAddAmigo() {
     if (!usernameAmigo.trim()) {
-      Alert.alert('Error', 'El nombre de usuario es obligatorio.');
+      Alert.alert(i18n.t('common.error'), i18n.t('social.usernameRequired'));
       return;
     }
     setSendingRequest(true);
     try {
       const res = await api.enviarSolicitudAmistad(usernameAmigo.trim());
-      Alert.alert('Enviada', res.message);
+      Alert.alert(i18n.t('social.requestSent'), res.message);
       setShowAddAmigo(false);
       setUsernameAmigo('');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo enviar la solicitud.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('social.sendRequestError'));
     } finally {
       setSendingRequest(false);
     }
@@ -145,13 +146,13 @@ export default function SocialScreen() {
     };
 
     if (Platform.OS === 'web') {
-      if (window.confirm(`¿Eliminar a ${amigo.nombre} de tus amigos?`)) {
+      if (window.confirm(i18n.t('social.deleteFriendConfirm', { name: amigo.nombre }))) {
         await doDelete();
       }
     } else {
-      Alert.alert('Eliminar amigo', `¿Eliminar a ${amigo.nombre} de tus amigos?`, [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar', style: 'destructive', onPress: doDelete },
+      Alert.alert(i18n.t('social.deleteFriend'), i18n.t('social.deleteFriendConfirm', { name: amigo.nombre }), [
+        { text: i18n.t('common.cancel'), style: 'cancel' },
+        { text: i18n.t('common.delete'), style: 'destructive', onPress: doDelete },
       ]);
     }
   }
@@ -174,9 +175,9 @@ export default function SocialScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="people-outline" size={64} color={Colors.border} />
-            <Text style={styles.emptyTitle}>Sin grupos</Text>
+            <Text style={styles.emptyTitle}>{i18n.t('social.noGroups')}</Text>
             <Text style={styles.emptySubtitle}>
-              No perteneces a ningún grupo todavía.
+              {i18n.t('social.noGroupsDesc')}
             </Text>
           </View>
         }
@@ -213,7 +214,7 @@ export default function SocialScreen() {
             return (
               <View style={styles.solicitudCard}>
                 <View style={styles.solicitudBadge}>
-                  <Text style={styles.solicitudBadgeText}>Solicitud</Text>
+                  <Text style={styles.solicitudBadgeText}>{i18n.t('social.request')}</Text>
                 </View>
                 <View style={styles.amigoInfo}>
                   <View style={styles.amigoIconContainer}>
@@ -230,14 +231,14 @@ export default function SocialScreen() {
                     onPress={() => handleResponderSolicitud(sol.id, 'aceptada')}
                   >
                     <Ionicons name="checkmark" size={20} color={Colors.white} />
-                    <Text style={styles.acceptButtonText}>Aceptar</Text>
+                    <Text style={styles.acceptButtonText}>{i18n.t('common.accept')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.rejectButton}
                     onPress={() => handleResponderSolicitud(sol.id, 'rechazada')}
                   >
                     <Ionicons name="close" size={20} color={Colors.danger} />
-                    <Text style={styles.rejectButtonText}>Rechazar</Text>
+                    <Text style={styles.rejectButtonText}>{i18n.t('common.reject')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -255,7 +256,7 @@ export default function SocialScreen() {
                   <Text style={styles.amigoNombre}>{amigo.nombre}</Text>
                   <Text style={styles.amigoUsername}>@{amigo.username}</Text>
                   {amigo.edad && (
-                    <Text style={styles.amigoDetalle}>{amigo.edad} años</Text>
+                    <Text style={styles.amigoDetalle}>{amigo.edad} {i18n.t('common.years')}</Text>
                   )}
                 </View>
               </View>
@@ -272,9 +273,9 @@ export default function SocialScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="heart-outline" size={64} color={Colors.border} />
-            <Text style={styles.emptyTitle}>Sin amigos</Text>
+            <Text style={styles.emptyTitle}>{i18n.t('social.noFriends')}</Text>
             <Text style={styles.emptySubtitle}>
-              Añade amigos usando su correo electrónico.
+              {i18n.t('social.noFriendsDesc')}
             </Text>
           </View>
         }
@@ -299,7 +300,7 @@ export default function SocialScreen() {
             color={activeTab === 'amigos' ? Colors.primary : Colors.textSecondary}
           />
           <Text style={[styles.tabText, activeTab === 'amigos' && styles.tabTextActive]}>
-            Amigos
+            {i18n.t('social.friends')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -312,7 +313,7 @@ export default function SocialScreen() {
             color={activeTab === 'grupos' ? Colors.primary : Colors.textSecondary}
           />
           <Text style={[styles.tabText, activeTab === 'grupos' && styles.tabTextActive]}>
-            Grupos
+            {i18n.t('social.groups')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -336,11 +337,11 @@ export default function SocialScreen() {
       <Modal visible={showCreateGrupo} animationType="fade" transparent onRequestClose={() => setShowCreateGrupo(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Nuevo grupo</Text>
-            <Text style={styles.fieldLabel}>Nombre del grupo</Text>
+            <Text style={styles.modalTitle}>{i18n.t('social.newGroup')}</Text>
+            <Text style={styles.fieldLabel}>{i18n.t('social.groupName')}</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Ej: Amigos CF"
+              placeholder={i18n.t('social.groupNamePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={newNombreGrupo}
               onChangeText={setNewNombreGrupo}
@@ -348,14 +349,14 @@ export default function SocialScreen() {
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowCreateGrupo(false); setNewNombreGrupo(''); }}>
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <Text style={styles.cancelButtonText}>{i18n.t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.createButton, creatingGrupo && styles.buttonDisabled]}
                 onPress={handleCreateGrupo}
                 disabled={creatingGrupo}
               >
-                {creatingGrupo ? <ActivityIndicator color={Colors.white} size="small" /> : <Text style={styles.createButtonText}>Crear</Text>}
+                {creatingGrupo ? <ActivityIndicator color={Colors.white} size="small" /> : <Text style={styles.createButtonText}>{i18n.t('common.create')}</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -366,11 +367,11 @@ export default function SocialScreen() {
       <Modal visible={showAddAmigo} animationType="fade" transparent onRequestClose={() => setShowAddAmigo(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Añadir amigo</Text>
-            <Text style={styles.fieldLabel}>Nombre de usuario</Text>
+            <Text style={styles.modalTitle}>{i18n.t('social.addFriend')}</Text>
+            <Text style={styles.fieldLabel}>{i18n.t('social.username')}</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Ej: juanito"
+              placeholder={i18n.t('social.usernamePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={usernameAmigo}
               onChangeText={setUsernameAmigo}
@@ -380,14 +381,14 @@ export default function SocialScreen() {
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowAddAmigo(false); setUsernameAmigo(''); }}>
-                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                <Text style={styles.cancelButtonText}>{i18n.t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.createButton, sendingRequest && styles.buttonDisabled]}
                 onPress={handleAddAmigo}
                 disabled={sendingRequest}
               >
-                {sendingRequest ? <ActivityIndicator color={Colors.white} size="small" /> : <Text style={styles.createButtonText}>Enviar</Text>}
+                {sendingRequest ? <ActivityIndicator color={Colors.white} size="small" /> : <Text style={styles.createButtonText}>{i18n.t('common.send')}</Text>}
               </TouchableOpacity>
             </View>
           </View>

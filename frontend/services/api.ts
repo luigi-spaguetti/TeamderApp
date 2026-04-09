@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   ApiResponse,
@@ -13,12 +14,22 @@ import {
   SolicitudAmistad,
 } from '../types';
 
-const LOCAL_IP = '192.168.1.19';
+function getBaseUrl(): string {
+  if (Platform.OS === 'web') return 'http://localhost:3000/api';
 
-const BASE_URL =
-  Platform.OS === 'web'
-    ? 'http://localhost:3000/api'
-    : `http://${LOCAL_IP}:3000/api`;
+  // Expo dev server already knows our PC's LAN IP — reuse it
+  const debuggerHost =
+    Constants.expoConfig?.hostUri ?? (Constants as any).manifest?.debuggerHost;
+  if (debuggerHost) {
+    const ip = debuggerHost.split(':')[0];
+    return `http://${ip}:3000/api`;
+  }
+
+  // Fallback (should never happen in dev)
+  return 'http://localhost:3000/api';
+}
+
+const BASE_URL = getBaseUrl();
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const token = await AsyncStorage.getItem('token');
@@ -149,7 +160,7 @@ export async function createPartido(data: {
   huecos: number;
   latitud?: number;
   longitud?: number;
-  id_grupo?: number;
+  grupo_ids?: number[];
 }): Promise<ApiResponse<Partido>> {
   return request('/partidos', {
     method: 'POST',

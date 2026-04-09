@@ -15,6 +15,7 @@ import { GrupoDetalle, Solicitud } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 export default function GrupoDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,7 +45,7 @@ export default function GrupoDetailScreen() {
         }
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo cargar el grupo.');
+      Alert.alert(i18n.t('common.error'), error.message);
       router.back();
     } finally {
       setLoading(false);
@@ -64,11 +65,11 @@ export default function GrupoDetailScreen() {
     try {
       await api.enviarSolicitud(Number(id));
       Alert.alert(
-        'Solicitud enviada',
-        'Tu solicitud ha sido enviada al administrador del grupo.'
+        i18n.t('grupo.requestSent'),
+        i18n.t('grupo.requestSentMsg')
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo enviar la solicitud.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('grupo.sendRequestError'));
     } finally {
       setActionLoading(false);
     }
@@ -82,12 +83,12 @@ export default function GrupoDetailScreen() {
     try {
       await api.responderSolicitud(solicitudId, estado);
       Alert.alert(
-        'Solicitud procesada',
-        `La solicitud ha sido ${estado}.`
+        i18n.t('grupo.requestProcessed'),
+        estado === 'aceptada' ? i18n.t('grupo.requestAccepted') : i18n.t('grupo.requestRejected')
       );
       await loadGrupo();
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo procesar la solicitud.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('grupo.processError'));
     } finally {
       setRespondingId(null);
     }
@@ -98,7 +99,7 @@ export default function GrupoDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: 'Grupo',
+            title: i18n.t('grupo.title'),
             headerStyle: { backgroundColor: Colors.primary },
             headerTintColor: Colors.white,
           }}
@@ -132,13 +133,13 @@ export default function GrupoDetailScreen() {
             <Text style={styles.groupName}>{grupo.nombre}</Text>
             <Text style={styles.memberCount}>
               {grupo.miembros?.length ?? grupo.integrantes ?? 0}{' '}
-              {(grupo.miembros?.length ?? 0) === 1 ? 'miembro' : 'miembros'}
+              {(grupo.miembros?.length ?? 0) === 1 ? i18n.t('common.member') : i18n.t('common.members')}
             </Text>
           </View>
 
           {/* Members */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Miembros</Text>
+            <Text style={styles.sectionTitle}>{i18n.t('grupo.members')}</Text>
             {grupo.miembros && grupo.miembros.length > 0 ? (
               grupo.miembros.map((miembro) => (
                 <View key={miembro.id} style={styles.memberRow}>
@@ -149,25 +150,25 @@ export default function GrupoDetailScreen() {
                   {miembro.es_admin && (
                     <View style={styles.adminBadge}>
                       <Ionicons name="shield" size={12} color={Colors.secondary} />
-                      <Text style={styles.adminBadgeText}>Admin</Text>
+                      <Text style={styles.adminBadgeText}>{i18n.t('grupo.admin')}</Text>
                     </View>
                   )}
                   {miembro.id === user?.id && (
                     <View style={styles.youBadge}>
-                      <Text style={styles.youBadgeText}>Tú</Text>
+                      <Text style={styles.youBadgeText}>{i18n.t('common.you')}</Text>
                     </View>
                   )}
                 </View>
               ))
             ) : (
-              <Text style={styles.emptyText}>No hay miembros.</Text>
+              <Text style={styles.emptyText}>{i18n.t('grupo.noMembers')}</Text>
             )}
           </View>
 
           {/* Solicitudes (Admin only) */}
           {isAdmin && solicitudes.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Solicitudes pendientes</Text>
+              <Text style={styles.sectionTitle}>{i18n.t('grupo.pendingRequests')}</Text>
               {solicitudes.map((solicitud) => (
                 <View key={solicitud.id} style={styles.solicitudRow}>
                   <View style={styles.solicitudInfo}>
@@ -239,7 +240,7 @@ export default function GrupoDetailScreen() {
                       size={20}
                       color={Colors.white}
                     />
-                    <Text style={styles.joinButtonText}>Solicitar unirse</Text>
+                    <Text style={styles.joinButtonText}>{i18n.t('grupo.joinRequest')}</Text>
                   </>
                 )}
               </TouchableOpacity>

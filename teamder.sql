@@ -45,6 +45,14 @@ CREATE TABLE usuario_partido(
     CONSTRAINT fk_partido_usuario FOREIGN KEY (id_partido) REFERENCES partidos(id)
 );
 
+CREATE TABLE partido_grupo(
+	id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+    id_partido INT,
+    id_grupo INT,
+    CONSTRAINT fk_pg_partido FOREIGN KEY (id_partido) REFERENCES partidos(id),
+    CONSTRAINT fk_pg_grupo FOREIGN KEY (id_grupo) REFERENCES grupos(id)
+);
+
 CREATE TABLE usuario_grupo(
 	id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
 	id_grupo INT,
@@ -134,6 +142,10 @@ INSERT INTO partidos(provincia, municipio, pista, modalidad, fecha, hora, huecos
 INSERT INTO partidos(provincia, municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos) VALUES('Cádiz', 'Jerez de la Frontera', 'Pabellón Gadir', 'Futbol Sala', '2026-06-20', '23:00:00', 10, 2);
 INSERT INTO partidos(provincia, municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos, id_grupo) VALUES('Cádiz', 'Cádiz', 'Campo hondo', 'Baloncesto', '2026-06-20', '23:00:00', 10, 2, 1);
 INSERT INTO partidos(provincia, municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos, id_grupo) VALUES('Sevilla', 'Sevilla', 'Polideportivo San Pablo', 'Futbol Sala', '2026-07-10', '19:00:00', 10, 1, 3);
+
+-- Asociaciones partido-grupo (partidos compartidos con grupos)
+INSERT INTO partido_grupo(id_partido, id_grupo) VALUES (5, 1);
+INSERT INTO partido_grupo(id_partido, id_grupo) VALUES (6, 3);
 
 -- Inscripciones consistentes con huecos_inscritos
 INSERT INTO usuario_partido(id_usuario, id_partido) VALUES (1, 1);

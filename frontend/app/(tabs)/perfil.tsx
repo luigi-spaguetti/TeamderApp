@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 export default function PerfilScreen() {
   const { user, logout, updateUser } = useAuth();
@@ -49,9 +50,9 @@ export default function PerfilScreen() {
       });
       updateUser(response.data);
       setEditing(false);
-      Alert.alert('Perfil actualizado', 'Los cambios se han guardado correctamente.');
+      Alert.alert(i18n.t('perfil.profileUpdated'), i18n.t('perfil.profileUpdatedMsg'));
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo actualizar el perfil.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('perfil.updateError'));
     } finally {
       setSaving(false);
     }
@@ -69,16 +70,16 @@ export default function PerfilScreen() {
 
   function handleLogout() {
     if (Platform.OS === 'web') {
-      if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+      if (window.confirm(i18n.t('perfil.logoutConfirm'))) {
         logout();
       }
     } else {
       Alert.alert(
-        'Cerrar sesión',
-        '¿Estás seguro de que quieres cerrar sesión?',
+        i18n.t('perfil.logout'),
+        i18n.t('perfil.logoutConfirm'),
         [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Cerrar sesión', style: 'destructive', onPress: logout },
+          { text: i18n.t('common.cancel'), style: 'cancel' },
+          { text: i18n.t('perfil.logout'), style: 'destructive', onPress: logout },
         ]
       );
     }
@@ -112,7 +113,7 @@ export default function PerfilScreen() {
                 onPress={() => setEditing(true)}
               >
                 <Ionicons name="create-outline" size={18} color={Colors.primary} />
-                <Text style={styles.editButtonText}>Editar perfil</Text>
+                <Text style={styles.editButtonText}>{i18n.t('perfil.editProfile')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -124,7 +125,7 @@ export default function PerfilScreen() {
                 <Ionicons name="mail-outline" size={20} color={Colors.primary} />
               </View>
               <View style={styles.fieldContent}>
-                <Text style={styles.fieldLabel}>Correo electrónico</Text>
+                <Text style={styles.fieldLabel}>{i18n.t('perfil.email')}</Text>
                 {editing ? (
                   <TextInput
                     style={styles.fieldInput}
@@ -132,12 +133,12 @@ export default function PerfilScreen() {
                     onChangeText={setCorreo}
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    placeholder="correo@ejemplo.com"
+                    placeholder={i18n.t('perfil.emailPlaceholder')}
                     placeholderTextColor={Colors.textSecondary}
                   />
                 ) : (
                   <Text style={styles.fieldValue}>
-                    {user.correo || 'No especificado'}
+                    {user.correo || i18n.t('perfil.notSpecified')}
                   </Text>
                 )}
               </View>
@@ -150,19 +151,19 @@ export default function PerfilScreen() {
                 <Ionicons name="calendar-outline" size={20} color={Colors.primary} />
               </View>
               <View style={styles.fieldContent}>
-                <Text style={styles.fieldLabel}>Edad</Text>
+                <Text style={styles.fieldLabel}>{i18n.t('perfil.age')}</Text>
                 {editing ? (
                   <TextInput
                     style={styles.fieldInput}
                     value={edad}
                     onChangeText={setEdad}
                     keyboardType="numeric"
-                    placeholder="Ej: 25"
+                    placeholder={i18n.t('perfil.agePlaceholder')}
                     placeholderTextColor={Colors.textSecondary}
                   />
                 ) : (
                   <Text style={styles.fieldValue}>
-                    {user.edad != null ? `${user.edad} años` : 'No especificada'}
+                    {user.edad != null ? `${user.edad} ${i18n.t('common.years')}` : i18n.t('perfil.ageNotSpecified')}
                   </Text>
                 )}
               </View>
@@ -175,19 +176,19 @@ export default function PerfilScreen() {
                 <Ionicons name="call-outline" size={20} color={Colors.primary} />
               </View>
               <View style={styles.fieldContent}>
-                <Text style={styles.fieldLabel}>Teléfono</Text>
+                <Text style={styles.fieldLabel}>{i18n.t('perfil.phone')}</Text>
                 {editing ? (
                   <TextInput
                     style={styles.fieldInput}
                     value={telefono}
                     onChangeText={setTelefono}
                     keyboardType="numeric"
-                    placeholder="Ej: 612345678"
+                    placeholder={i18n.t('perfil.phonePlaceholder')}
                     placeholderTextColor={Colors.textSecondary}
                   />
                 ) : (
                   <Text style={styles.fieldValue}>
-                    {user.telefono != null ? user.telefono.toString() : 'No especificado'}
+                    {user.telefono != null ? user.telefono.toString() : i18n.t('perfil.notSpecified')}
                   </Text>
                 )}
               </View>
@@ -200,7 +201,7 @@ export default function PerfilScreen() {
                 <Ionicons name="document-text-outline" size={20} color={Colors.primary} />
               </View>
               <View style={styles.fieldContent}>
-                <Text style={styles.fieldLabel}>Descripción</Text>
+                <Text style={styles.fieldLabel}>{i18n.t('perfil.description')}</Text>
                 {editing ? (
                   <TextInput
                     style={[styles.fieldInput, styles.textArea]}
@@ -208,12 +209,12 @@ export default function PerfilScreen() {
                     onChangeText={setDescripcion}
                     multiline
                     numberOfLines={3}
-                    placeholder="Cuéntanos sobre ti..."
+                    placeholder={i18n.t('perfil.descriptionPlaceholder')}
                     placeholderTextColor={Colors.textSecondary}
                   />
                 ) : (
                   <Text style={styles.fieldValue}>
-                    {user.descripcion || 'Sin descripción'}
+                    {user.descripcion || i18n.t('perfil.noDescription')}
                   </Text>
                 )}
               </View>
@@ -227,7 +228,7 @@ export default function PerfilScreen() {
                 style={styles.cancelActionButton}
                 onPress={handleCancel}
               >
-                <Text style={styles.cancelActionText}>Cancelar</Text>
+                <Text style={styles.cancelActionText}>{i18n.t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.saveButton, saving && styles.buttonDisabled]}
@@ -238,7 +239,7 @@ export default function PerfilScreen() {
                 {saving ? (
                   <ActivityIndicator color={Colors.white} size="small" />
                 ) : (
-                  <Text style={styles.saveButtonText}>Guardar cambios</Text>
+                  <Text style={styles.saveButtonText}>{i18n.t('perfil.saveChanges')}</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -251,7 +252,7 @@ export default function PerfilScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
-            <Text style={styles.logoutText}>Cerrar sesión</Text>
+            <Text style={styles.logoutText}>{i18n.t('perfil.logout')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

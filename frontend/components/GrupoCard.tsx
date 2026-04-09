@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Grupo } from '../types';
 import Colors from '../constants/Colors';
+import i18n from '../i18n';
 
 interface GrupoCardProps {
   grupo: Grupo;
@@ -32,7 +33,7 @@ export default function GrupoCard({ grupo }: GrupoCardProps) {
             color={Colors.textSecondary}
           />
           <Text style={styles.memberText}>
-            {grupo.integrantes ?? 0} {(grupo.integrantes ?? 0) === 1 ? 'miembro' : 'miembros'}
+            {grupo.integrantes ?? 0} {(grupo.integrantes ?? 0) === 1 ? i18n.t('common.member') : i18n.t('common.members')}
           </Text>
         </View>
       </View>

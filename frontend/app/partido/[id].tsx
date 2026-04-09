@@ -17,6 +17,7 @@ import { PartidoDetalle } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 function getModalidadIcon(modalidad: string): keyof typeof Ionicons.glyphMap {
   const lower = modalidad.toLowerCase();
@@ -60,7 +61,7 @@ export default function PartidoDetailScreen() {
       const response = await api.getPartido(Number(id));
       setPartido(response.data);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo cargar el partido.');
+      Alert.alert(i18n.t('common.error'), error.message);
       router.back();
     } finally {
       setLoading(false);
@@ -81,10 +82,10 @@ export default function PartidoDetailScreen() {
     setActionLoading(true);
     try {
       await api.inscribirse(Number(id));
-      Alert.alert('Inscrito', 'Te has inscrito correctamente al partido.');
+      Alert.alert(i18n.t('partido.joined'), i18n.t('partido.joinedMsg'));
       await loadPartido();
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo realizar la inscripción.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('partido.joinError'));
     } finally {
       setActionLoading(false);
     }
@@ -92,21 +93,21 @@ export default function PartidoDetailScreen() {
 
   async function handleDesinscribirse() {
     Alert.alert(
-      'Confirmar',
-      '¿Seguro que quieres desinscribirte de este partido?',
+      i18n.t('common.confirm'),
+      i18n.t('partido.leaveConfirm'),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: 'Desinscribirme',
+          text: i18n.t('partido.leave'),
           style: 'destructive',
           onPress: async () => {
             setActionLoading(true);
             try {
               await api.desinscribirse(Number(id));
-              Alert.alert('Desinscrito', 'Te has desinscrito del partido.');
+              Alert.alert(i18n.t('partido.left'), i18n.t('partido.leftMsg'));
               await loadPartido();
             } catch (error: any) {
-              Alert.alert('Error', error.message || 'No se pudo desinscribir.');
+              Alert.alert(i18n.t('common.error'), error.message || i18n.t('partido.leaveError'));
             } finally {
               setActionLoading(false);
             }
@@ -119,7 +120,7 @@ export default function PartidoDetailScreen() {
   if (loading) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Partido', headerStyle: { backgroundColor: Colors.primary }, headerTintColor: Colors.white }} />
+        <Stack.Screen options={{ title: i18n.t('partido.title'), headerStyle: { backgroundColor: Colors.primary }, headerTintColor: Colors.white }} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
@@ -157,7 +158,7 @@ export default function PartidoDetailScreen() {
                 onPress={() => router.push(`/grupo/${partido.id_grupo}`)}
               >
                 <Ionicons name="people" size={14} color={Colors.primary} />
-                <Text style={styles.grupoBadgeText}>Partido de grupo</Text>
+                <Text style={styles.grupoBadgeText}>{i18n.t('partido.groupMatch')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -166,13 +167,13 @@ export default function PartidoDetailScreen() {
           <View style={styles.infoGrid}>
             <View style={styles.infoCard}>
               <Ionicons name="location-outline" size={22} color={Colors.primary} />
-              <Text style={styles.infoLabel}>Ubicación</Text>
+              <Text style={styles.infoLabel}>{i18n.t('partido.location')}</Text>
               <Text style={styles.infoValue}>{partido.pista}</Text>
               <Text style={styles.infoSubvalue}>{partido.municipio}</Text>
             </View>
             <View style={styles.infoCard}>
               <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
-              <Text style={styles.infoLabel}>Fecha y hora</Text>
+              <Text style={styles.infoLabel}>{i18n.t('partido.dateTime')}</Text>
               <Text style={styles.infoValue}>{formatFecha(partido.fecha)}</Text>
               <Text style={styles.infoSubvalue}>{formatHora(partido.hora)}</Text>
             </View>
@@ -190,7 +191,7 @@ export default function PartidoDetailScreen() {
           {/* Capacity */}
           <View style={styles.capacitySection}>
             <View style={styles.capacityHeader}>
-              <Text style={styles.sectionTitle}>Plazas</Text>
+              <Text style={styles.sectionTitle}>{i18n.t('partido.capacity')}</Text>
               <Text style={[styles.capacityCount, isFull && styles.capacityFull]}>
                 {partido.huecos_inscritos} / {partido.huecos}
               </Text>
@@ -207,13 +208,13 @@ export default function PartidoDetailScreen() {
               />
             </View>
             {isFull && (
-              <Text style={styles.fullText}>Partido completo</Text>
+              <Text style={styles.fullText}>{i18n.t('partido.full')}</Text>
             )}
           </View>
 
           {/* Inscribed Players */}
           <View style={styles.playersSection}>
-            <Text style={styles.sectionTitle}>Jugadores inscritos</Text>
+            <Text style={styles.sectionTitle}>{i18n.t('partido.players')}</Text>
             {partido.inscritos && partido.inscritos.length > 0 ? (
               partido.inscritos.map((jugador) => (
                 <View key={jugador.id} style={styles.playerRow}>
@@ -223,14 +224,14 @@ export default function PartidoDetailScreen() {
                   <Text style={styles.playerName}>{jugador.nombre}</Text>
                   {jugador.id === user?.id && (
                     <View style={styles.youBadge}>
-                      <Text style={styles.youBadgeText}>Tú</Text>
+                      <Text style={styles.youBadgeText}>{i18n.t('common.you')}</Text>
                     </View>
                   )}
                 </View>
               ))
             ) : (
               <Text style={styles.noPlayersText}>
-                Aún no hay jugadores inscritos.
+                {i18n.t('partido.noPlayers')}
               </Text>
             )}
           </View>
@@ -250,7 +251,7 @@ export default function PartidoDetailScreen() {
               ) : (
                 <>
                   <Ionicons name="close-circle-outline" size={20} color={Colors.white} />
-                  <Text style={styles.actionButtonText}>Desinscribirme</Text>
+                  <Text style={styles.actionButtonText}>{i18n.t('partido.leave')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -271,7 +272,7 @@ export default function PartidoDetailScreen() {
                 <>
                   <Ionicons name="checkmark-circle-outline" size={20} color={Colors.white} />
                   <Text style={styles.actionButtonText}>
-                    {isFull ? 'Partido completo' : 'Inscribirme'}
+                    {isFull ? i18n.t('partido.full') : i18n.t('partido.join')}
                   </Text>
                 </>
               )}

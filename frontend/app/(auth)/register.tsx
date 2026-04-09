@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -29,7 +30,7 @@ export default function RegisterScreen() {
 
   async function handleRegister() {
     if (!username.trim() || !nombre.trim() || !correo.trim() || !contrasena.trim()) {
-      Alert.alert('Error', 'Usuario, nombre, correo y contraseña son obligatorios.');
+      Alert.alert(i18n.t('common.error'), i18n.t('register.requiredFields'));
       return;
     }
 
@@ -44,7 +45,7 @@ export default function RegisterScreen() {
         telefono ? parseInt(telefono, 10) : undefined
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo crear la cuenta.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('register.registerFailed'));
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ export default function RegisterScreen() {
           >
             <Ionicons name="arrow-back" size={24} color={Colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Crear cuenta</Text>
+          <Text style={styles.headerTitle}>{i18n.t('register.title')}</Text>
         </View>
 
         <View style={styles.formContainer}>
@@ -79,7 +80,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Nombre de usuario *"
+              placeholder={i18n.t('register.usernamePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={username}
               onChangeText={setUsername}
@@ -97,7 +98,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Nombre *"
+              placeholder={i18n.t('register.namePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={nombre}
               onChangeText={setNombre}
@@ -113,7 +114,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Correo electrónico *"
+              placeholder={i18n.t('register.emailPlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={correo}
               onChangeText={setCorreo}
@@ -132,7 +133,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Contraseña *"
+              placeholder={i18n.t('register.passwordPlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={contrasena}
               onChangeText={setContrasena}
@@ -149,7 +150,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Edad (opcional)"
+              placeholder={i18n.t('register.agePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={edad}
               onChangeText={setEdad}
@@ -166,7 +167,7 @@ export default function RegisterScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Teléfono (opcional)"
+              placeholder={i18n.t('register.phonePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={telefono}
               onChangeText={setTelefono}
@@ -183,7 +184,7 @@ export default function RegisterScreen() {
             {loading ? (
               <ActivityIndicator color={Colors.white} />
             ) : (
-              <Text style={styles.buttonText}>Registrarse</Text>
+              <Text style={styles.buttonText}>{i18n.t('register.registerButton')}</Text>
             )}
           </TouchableOpacity>
 
@@ -192,8 +193,8 @@ export default function RegisterScreen() {
             onPress={() => router.back()}
           >
             <Text style={styles.linkText}>
-              ¿Ya tienes cuenta?{' '}
-              <Text style={styles.linkHighlight}>Inicia sesión</Text>
+              {i18n.t('register.hasAccount')}{' '}
+              <Text style={styles.linkHighlight}>{i18n.t('register.loginLink')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

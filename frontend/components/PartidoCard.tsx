@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Partido } from '../types';
 import Colors from '../constants/Colors';
+import i18n from '../i18n';
 
 interface PartidoCardProps {
   partido: Partido;
@@ -75,7 +76,7 @@ export default function PartidoCard({ partido }: PartidoCardProps) {
 
       <View style={styles.capacityContainer}>
         <View style={styles.capacityHeader}>
-          <Text style={styles.capacityLabel}>Plazas</Text>
+          <Text style={styles.capacityLabel}>{i18n.t('partidos.plazas')}</Text>
           <Text style={[styles.capacityText, isFull && styles.capacityFull]}>
             {partido.huecos_inscritos}/{partido.huecos}
           </Text>

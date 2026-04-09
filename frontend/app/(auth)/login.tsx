@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -29,13 +30,13 @@ export default function LoginScreen() {
   function handleGoogleSignIn() {
     Alert.alert(
       'Google Sign-In',
-      'Para activar el inicio de sesión con Google, configura tu Google Client ID en la consola de Google Cloud.'
+      i18n.t('login.googleAlert')
     );
   }
 
   async function handleLogin() {
     if (!username.trim() || !contrasena.trim()) {
-      Alert.alert('Error', 'Por favor, completa todos los campos.');
+      Alert.alert(i18n.t('common.error'), i18n.t('login.fillAllFields'));
       return;
     }
 
@@ -43,7 +44,7 @@ export default function LoginScreen() {
     try {
       await login(username.trim(), contrasena);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo iniciar sesión.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -65,11 +66,11 @@ export default function LoginScreen() {
             resizeMode="contain"
           />
           <Text style={styles.title}>Teamder</Text>
-          <Text style={styles.tagline}>Encuentra tu partido</Text>
+          <Text style={styles.tagline}>{i18n.t('login.tagline')}</Text>
         </View>
 
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Iniciar sesión</Text>
+          <Text style={styles.formTitle}>{i18n.t('login.title')}</Text>
 
           <View style={styles.inputContainer}>
             <Ionicons
@@ -80,7 +81,7 @@ export default function LoginScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Nombre de usuario"
+              placeholder={i18n.t('login.usernamePlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={username}
               onChangeText={setUsername}
@@ -98,7 +99,7 @@ export default function LoginScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder={i18n.t('login.passwordPlaceholder')}
               placeholderTextColor={Colors.textSecondary}
               value={contrasena}
               onChangeText={setContrasena}
@@ -115,13 +116,13 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color={Colors.white} />
             ) : (
-              <Text style={styles.buttonText}>Entrar</Text>
+              <Text style={styles.buttonText}>{i18n.t('login.enterButton')}</Text>
             )}
           </TouchableOpacity>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>o</Text>
+            <Text style={styles.dividerText}>{i18n.t('common.or')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -131,7 +132,7 @@ export default function LoginScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="logo-google" size={20} color="#DB4437" />
-            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+            <Text style={styles.googleButtonText}>{i18n.t('login.continueGoogle')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -139,8 +140,8 @@ export default function LoginScreen() {
             onPress={() => router.push('/(auth)/register')}
           >
             <Text style={styles.linkText}>
-              ¿No tienes cuenta?{' '}
-              <Text style={styles.linkHighlight}>Regístrate</Text>
+              {i18n.t('login.noAccount')}{' '}
+              <Text style={styles.linkHighlight}>{i18n.t('login.register')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

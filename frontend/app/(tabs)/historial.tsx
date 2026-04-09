@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { HistorialItem } from '../../types';
 import * as api from '../../services/api';
 import Colors from '../../constants/Colors';
+import i18n from '../../i18n';
 
 function getModalidadIcon(modalidad: string): keyof typeof Ionicons.glyphMap {
   const lower = modalidad.toLowerCase();
@@ -52,7 +53,7 @@ export default function HistorialScreen() {
       const response = await api.getHistorial();
       setHistorial(response.data);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo cargar el historial.');
+      Alert.alert(i18n.t('common.error'), error.message || i18n.t('historial.loadError'));
     }
   }, []);
 
@@ -102,9 +103,9 @@ export default function HistorialScreen() {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons name="time-outline" size={64} color={Colors.border} />
-        <Text style={styles.emptyTitle}>Sin historial</Text>
+        <Text style={styles.emptyTitle}>{i18n.t('historial.empty')}</Text>
         <Text style={styles.emptySubtitle}>
-          Aquí aparecerán los partidos que ya hayas jugado.
+          {i18n.t('historial.emptyDesc')}
         </Text>
       </View>
     );

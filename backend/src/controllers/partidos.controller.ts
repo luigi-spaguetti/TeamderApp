@@ -7,30 +7,38 @@ export const getPartidos = async (req: AuthRequest, res: Response): Promise<void
   try {
     const { provincia, municipio, modalidad, fecha } = req.query;
 
-    let query = 'SELECT * FROM partidos WHERE (fecha > CURDATE() OR (fecha = CURDATE() AND hora >= CURTIME()))';
-    const params: any[] = [];
+    // Show public partidos (no group associations) + partidos shared with user's groups
+    let query = `SELECT DISTINCT p.* FROM partidos p
+      LEFT JOIN partido_grupo pg ON p.id = pg.id_partido
+      WHERE (p.fecha > CURDATE() OR (p.fecha = CURDATE() AND p.hora >= CURTIME()))
+      AND (
+        (pg.id_partido IS NULL AND p.id_grupo IS NULL)
+        OR pg.id_grupo IN (SELECT id_grupo FROM usuario_grupo WHERE id_usuario = ?)
+        OR p.id_grupo IN (SELECT id_grupo FROM usuario_grupo WHERE id_usuario = ?)
+      )`;
+    const params: any[] = [req.userId!, req.userId!];
 
     if (provincia) {
-      query += ' AND provincia = ?';
+      query += ' AND p.provincia = ?';
       params.push(provincia);
     }
 
     if (municipio) {
-      query += ' AND municipio = ?';
+      query += ' AND p.municipio = ?';
       params.push(municipio);
     }
 
     if (modalidad) {
-      query += ' AND modalidad = ?';
+      query += ' AND p.modalidad = ?';
       params.push(modalidad);
     }
 
     if (fecha) {
-      query += ' AND fecha = ?';
+      query += ' AND p.fecha = ?';
       params.push(fecha);
     }
 
-    query += ' ORDER BY fecha ASC, hora ASC';
+    query += ' ORDER BY p.fecha ASC, p.hora ASC';
 
     const [partidos] = await pool.execute<RowDataPacket[]>(query, params);
 
@@ -81,29 +89,42 @@ export const getPartidoById = async (req: AuthRequest, res: Response): Promise<v
 
 export const createPartido = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud, longitud, id_grupo } = req.body;
+    const { provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud, longitud, grupo_ids } = req.body;
 
     if (!provincia || !municipio || !pista || !modalidad || !fecha || !hora || !huecos) {
       res.status(400).json({ error: 'Los campos provincia, municipio, pista, modalidad, fecha, hora y huecos son obligatorios.' });
       return;
     }
 
-    if (id_grupo) {
+    // Validate group membership for all selected groups
+    const grupoIds: number[] = Array.isArray(grupo_ids) ? grupo_ids : [];
+    if (grupoIds.length > 0) {
+      const placeholders = grupoIds.map(() => '?').join(',');
       const [membership] = await pool.execute<RowDataPacket[]>(
-        'SELECT id FROM usuario_grupo WHERE id_grupo = ? AND id_usuario = ?',
-        [id_grupo, req.userId!]
+        `SELECT id_grupo FROM usuario_grupo WHERE id_usuario = ? AND id_grupo IN (${placeholders})`,
+        [req.userId!, ...grupoIds]
       );
-
-      if (membership.length === 0) {
-        res.status(403).json({ error: 'No eres miembro de este grupo.' });
+      if (membership.length !== grupoIds.length) {
+        res.status(403).json({ error: 'No eres miembro de todos los grupos seleccionados.' });
         return;
       }
     }
 
+    // Keep id_grupo as first group for backward compat
+    const idGrupo = grupoIds.length > 0 ? grupoIds[0] : null;
+
     const [result] = await pool.execute<ResultSetHeader>(
       'INSERT INTO partidos (provincia, municipio, pista, modalidad, fecha, hora, huecos, huecos_inscritos, latitud, longitud, id_grupo) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)',
-      [provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud || null, longitud || null, id_grupo || null]
+      [provincia, municipio, pista, modalidad, fecha, hora, huecos, latitud || null, longitud || null, idGrupo]
     );
+
+    // Insert into partido_grupo for each selected group
+    for (const gId of grupoIds) {
+      await pool.execute(
+        'INSERT INTO partido_grupo (id_partido, id_grupo) VALUES (?, ?)',
+        [result.insertId, gId]
+      );
+    }
 
     res.status(201).json({
       message: 'Partido creado correctamente.',
@@ -119,7 +140,8 @@ export const createPartido = async (req: AuthRequest, res: Response): Promise<vo
         huecos_inscritos: 0,
         latitud: latitud || null,
         longitud: longitud || null,
-        id_grupo: id_grupo || null
+        id_grupo: idGrupo,
+        grupo_ids: grupoIds
       }
     });
   } catch (error) {

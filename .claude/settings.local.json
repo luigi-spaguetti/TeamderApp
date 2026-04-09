@@ -23,7 +23,11 @@
       "Bash(jobs -l)",
       "Bash(mysql -u root -p1234 teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")",
       "Bash(mysql -u root teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")",
-      "Bash(mysql -u root -proot teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")"
+      "Bash(mysql -u root -proot teamder -e \"ALTER TABLE partidos ADD COLUMN latitud DOUBLE AFTER huecos_inscritos; ALTER TABLE partidos ADD COLUMN longitud DOUBLE AFTER latitud;\")",
+      "Bash(mysql -u root -p1234 teamder -e \"CREATE TABLE IF NOT EXISTS partido_grupo\\(id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT, id_partido INT, id_grupo INT, CONSTRAINT fk_pg_partido FOREIGN KEY \\(id_partido\\) REFERENCES partidos\\(id\\), CONSTRAINT fk_pg_grupo FOREIGN KEY \\(id_grupo\\) REFERENCES grupos\\(id\\)\\);\")",
+      "Bash(mysql -u root -proot teamder -e \"CREATE TABLE IF NOT EXISTS partido_grupo\\(id INT PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT, id_partido INT, id_grupo INT, CONSTRAINT fk_pg_partido FOREIGN KEY \\(id_partido\\) REFERENCES partidos\\(id\\), CONSTRAINT fk_pg_grupo FOREIGN KEY \\(id_grupo\\) REFERENCES grupos\\(id\\)\\);\")",
+      "Read(//tmp/**)",
+      "Bash(git add:*)"
     ]
   }
 }
